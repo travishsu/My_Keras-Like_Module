@@ -103,27 +103,5 @@ class Sequential:
     def fit(self, X, y, stepsize=1e-5):
         assert X.shape[1] == y.shape[1]
         n_sample = X.shape[1]
-        for i in xrange(n_sample):
+        # for i in xrange(n_sample):
             
-ij = np.random.randn(32,1)
-n2 = Dense(1, 5)
-n1 = Dense(5, 10)
-n = Dense(10, 32)
-
-# Try node's function
-n1.forward(n.forward(ij))
-L = n1.forward(n.forward(ij))
-n.backward(n1.backward(L))
-
-# Try model's function
-model = Sequential()
-model.add(n)
-model.add(Activation('sigmoid'))
-model.add(n1)
-model.add(Activation('sigmoid'))
-model.add(n2)
-model.compile(SquareError())
-for i in range(10000):
-    model.fit_single(ij, 5, 0.0001)
-
-
