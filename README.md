@@ -1,5 +1,5 @@
 # keras-like_NN
-Build deep learning stacks like Keras module
+Build stacks of neural network like Keras module
 
 ## Neurons
 
@@ -18,7 +18,7 @@ Build deep learning stacks like Keras module
  - Sequential
  - 
  
-## Basic Component A Neuron Must Have
+## Basic Components A Neuron Must Have
 
  - Forward propogation
  - Backward propogation
