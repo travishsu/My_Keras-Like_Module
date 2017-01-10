@@ -1,45 +1,57 @@
 import numpy as np
 
 class Neuron:
+    
     def __init__(self):
         pass
+    
     def update(self, stepsize):
         pass
 
 class Dense(Neuron):
+    
     def __init__(self, output_dim, input_dim):
         self.W = 0.01 * np.random.randn(output_dim, input_dim)
         self.bias = 0.01 * np.random.randn(output_dim, 1)
+    
     def forward(self, inputs):
         self.prev_in = np.array(inputs).astype(float).reshape(-1, 1)
         return  self.W.dot(inputs) + self.bias
+    
     def backward(self, loss):
         self.dW = loss.dot(self.prev_in.T)
         self.dbias = loss
         return loss.T.dot(self.W).T
+    
     def update(self, stepsize):
         self.W -= (stepsize/np.linalg.norm(self.dW)) * self.dW
         self.bias -= (stepsize/np.linalg.norm(self.dbias)) * self.dbias
 
 class Dropout(Neuron):
+    
     def __init__(self, p, input_dim):
         self.p   = p
         self.input_dim = input_dim
         self.idx = np.random.binomial(1, 1-p, size=input_dim).reshape(-1, 1)
         self.proportion = sum(self.idx) / float(self.input_dim)
+    
     def forward(self, inputs):
         self.prev_in = inputs
         return self.idx * inputs / self.proportion
+    
     def backward(self, loss):
         self.didx = self.idx / self.proportion
         return loss * self.didx
+    
     def update(self, stepsize):
         self.idx = np.random.binomial(1, 1-self.p, size=self.input_dim).reshape(-1, 1)
         self.proportion = sum(self.idx) / float(self.input_dim)
 
 class Activation(Neuron):
+    
     def __init__(self, atype):
         self.atype = atype
+    
     def forward(self, inputs):
         if self.atype == 'sigmoid':
             firing_rate = 1.0 / (1.0 + np.exp(-inputs))
@@ -67,10 +79,12 @@ class Activation(Neuron):
             return np.array( [(1 if s>0 else 0) for s in self.relu] ).reshape(self.relu.shape)
 
 class SquareError(Neuron):
+    
     def forward(self, inputs, targets):
         self.targets = np.reshape(targets, (-1, 1))
         self.prev_in = inputs.reshape(-1, 1)
         return (self.prev_in - self.targets).T.dot(self.prev_in - self.targets)
+    
     def backward(self, loss):
         return 2*(self.prev_in - self.targets)
 
@@ -82,6 +96,7 @@ class CrossEntropy(Neuron):
         self.targets = np.reshape(targets, (-1, 1))
         self.prev_in = inputs.reshape(-1, 1)
         return - np.sum( self.targets * np.log(self.prev_in) )
+    
     def backward(self, loss):
         summation = 0
         for i in xrange(self.targets.shape[0]):
@@ -91,17 +106,22 @@ class CrossEntropy(Neuron):
         #return - self.targets.T.dot( 1. / self.prev_in )
 
 class Sequential:
+    
     def __init__(self):
         self.nodes = []
+    
     def add(self, node):
         self.nodes.append(node)
+    
     def compile(self, evaluate_node):
         self.lossfun = evaluate_node
+    
     def evaluate_single(self, sample):
         L = sample
         for node in self.nodes:
             L = node.forward(L)
         return L
+    
     def fit_single(self, sample, targets, stepsize=1e-5):
         L = sample
         for node in self.nodes:
