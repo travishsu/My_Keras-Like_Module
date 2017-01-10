@@ -20,5 +20,5 @@ Build stacks of neural network like Keras module
  
 ## Basic Components A Neuron Must Have
 
- - Forward propogation
- - Backward propogation
+ - Forward propagation
+ - Backward propagation
