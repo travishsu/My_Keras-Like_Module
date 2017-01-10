@@ -9,9 +9,9 @@ class Neuron:
 class Dense(Neuron):
     def __init__(self, output_dim, input_dim):
         self.W = 0.01 * np.random.randn(output_dim, input_dim)
-        self.bias = 0.01 * np.random.randn(output_dim,1)
+        self.bias = 0.01 * np.random.randn(output_dim, 1)
     def forward(self, inputs):
-        self.prev_in = inputs
+        self.prev_in = np.array(inputs).astype(float).reshape(-1, 1)
         return  self.W.dot(inputs) + self.bias
     def backward(self, loss):
         self.dW = loss.dot(self.prev_in.T)
@@ -20,6 +20,22 @@ class Dense(Neuron):
     def update(self, stepsize):
         self.W -= (stepsize/np.linalg.norm(self.dW)) * self.dW
         self.bias -= (stepsize/np.linalg.norm(self.dbias)) * self.dbias
+
+class Dropout(Neuron):
+    def __init__(self, p, input_dim):
+        self.p   = p
+        self.input_dim = input_dim
+        self.idx = np.random.binomial(1, 1-p, size=input_dim).reshape(-1, 1)
+        self.proportion = sum(self.idx) / float(self.input_dim)
+    def forward(self, inputs):
+        self.prev_in = inputs
+        return self.idx * inputs / self.proportion
+    def backward(self, loss):
+        self.didx = self.idx / self.proportion
+        return loss * self.didx
+    def update(self, stepsize):
+        self.idx = np.random.binomial(1, 1-self.p, size=self.input_dim).reshape(-1, 1)
+        self.proportion = sum(self.idx) / float(self.input_dim)
 
 class Activation(Neuron):
     def __init__(self, atype):
@@ -101,7 +117,27 @@ class Sequential:
         self.nodes.reverse()
 
     def fit(self, X, y, stepsize=1e-5):
-        assert X.shape[1] == y.shape[1]
-        n_sample = X.shape[1]
-        # for i in xrange(n_sample):
+        assert X.shape[0] == y.shape[0]
+        n_sample = X.shape[0]
+        L_sum = 0
+        for i in xrange(n_sample):
+            L = X[i]
+            L = L.reshape(-1, 1)
+            targets = y[i]
+
+            for node in self.nodes:
+                L = node.forward(L)
+            L = self.lossfun.forward(L, targets) / n_sample
+            L_sum += L
+
+            dfun = L
+            dfun = self.lossfun.backward(dfun)
+            self.nodes.reverse()
+            for node in self.nodes:
+                dfun = node.backward(dfun)
+                node.update(stepsize)
+            self.nodes.reverse()
+
+        print("Loss: {} in {} samples.".format(L_sum, n_sample))
             
+
