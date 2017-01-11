@@ -135,6 +135,7 @@ class Sequential:
             dfun = node.backward(dfun)
             node.update(stepsize)
         self.nodes.reverse()
+        print ("loss: {}".format(L))
 
     def fit(self, X, y, stepsize=1e-5):
         assert X.shape[0] == y.shape[0]

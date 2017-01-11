@@ -7,6 +7,8 @@ Build stacks of neural network like Keras module
  - Multiply
  - Sum
  - Product
+ - Sine
+ - Cosine
  - Dense
  - Activation
  - Dropout

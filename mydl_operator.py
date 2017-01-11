@@ -49,3 +49,21 @@ class Product(Neuron):
     
     def backward(self, loss):
         self.dnumlist = loss * np.prod(self.numlist) / self.numlist
+
+class Sine(Neuron):
+
+    def forward(self, inputs):
+        self.prev_in = inputs
+        return np.sin(inputs)
+
+    def backward(self, loss):
+        return loss * np.cos(self.prev_in)
+
+class Cosine(Neuron):
+
+    def forward(self, inputs):
+        self.prev_in = inputs
+        return np.cos(inputs)
+
+    def backward(self, loss):
+        return - loss * np.sin(self.prev_in)
