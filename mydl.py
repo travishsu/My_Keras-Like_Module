@@ -76,7 +76,7 @@ class Activation(Neuron):
         if self.atype == 'softmax':
             return loss * self.expon * (self.sumexp - self.expon) / self.sumexp**2
         if self.atype == ' relu':
-            return np.array( [(1 if s>0 else 0) for s in self.relu] ).reshape(self.relu.shape)
+            return loss * np.array( [(1 if s>0 else 0) for s in self.relu] ).reshape(self.relu.shape)
 
 class SquareError(Neuron):
     
